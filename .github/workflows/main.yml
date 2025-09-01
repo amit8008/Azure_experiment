@@ -65,7 +65,7 @@ jobs:
   release-prod:
     needs: release-qa
     runs-on: ubuntu-latest
-    environment: Prod   # Require manual approval here
+    environment: prod   # Require manual approval here
     steps:
       - name: Download a Build Artifact
         uses: actions/download-artifact@v4
