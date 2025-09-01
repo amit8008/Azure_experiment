@@ -348,7 +348,7 @@
 					],
 					"transformations": [
 						{
-							"name": "aggregate1"
+							"name": "aggregate1updated"
 						}
 					],
 					"scriptLines": [
@@ -368,8 +368,8 @@
 						"     ignoreNoFilesFound: false,",
 						"     documentForm: 'documentPerLine') ~> source1",
 						"source1 aggregate(groupBy(country),",
-						"     name = count(name)) ~> aggregate1",
-						"aggregate1 sink(allowSchemaDrift: true,",
+						"     name = count(name)) ~> aggregate1updated",
+						"aggregate1updated sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     format: 'parquet',",
 						"     umask: 0022,",
