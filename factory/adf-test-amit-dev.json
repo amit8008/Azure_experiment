@@ -1,0 +1,9 @@
+{
+	"name": "adf-test-amit-dev",
+	"location": "centralindia",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "a2efce48-3962-4054-9f51-94b37933923f",
+		"tenantId": "048040fa-d182-4cdc-8fc0-39864acdef68"
+	}
+}
