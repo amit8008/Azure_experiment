@@ -57,8 +57,8 @@ jobs:
       - name: Deploy to QA ADF
         uses: Azure/data-factory-deploy-action@v1.2.0
         with:
-          resourceGroupName: ${{ env.RESOURCE_GROUP }}
-          dataFactoryName: ${{ env.ADF_NAME }}
+          resourceGroupName: ${{ vars.RESOURCE_GROUP }}
+          dataFactoryName: ${{ vars.ADF_NAME }}
           armTemplateFile: ARMTemplateForFactory.json
           armTemplateParametersFile: ARMTemplateParametersForFactory.json
 
@@ -83,7 +83,7 @@ jobs:
       - name: Deploy to Prod ADF
         uses: Azure/data-factory-deploy-action@v1.2.0
         with:
-          resourceGroupName: ${{ env.AZURE_RG_PROD }}
-          dataFactoryName: ${{ env.ADF_NAME_PROD }}
+          resourceGroupName: ${{ vars.AZURE_RG_PROD }}
+          dataFactoryName: ${{ vars.ADF_NAME_PROD }}
           armTemplateFile: ARMTemplateForFactory.json
           armTemplateParametersFile: ARMTemplateParametersForFactory.json
