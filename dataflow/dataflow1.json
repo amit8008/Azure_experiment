@@ -24,9 +24,6 @@
 			"transformations": [
 				{
 					"name": "aggregate1updated"
-				},
-				{
-					"name": "cast1"
 				}
 			],
 			"scriptLines": [
@@ -45,14 +42,9 @@
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false,",
 				"     documentForm: 'documentPerLine') ~> source1",
-				"cast1 aggregate(groupBy(country),",
+				"source1 aggregate(groupBy(country),",
 				"     name = count(name),",
 				"          circuitId = count(circuitId)) ~> aggregate1updated",
-				"source1 cast(output(",
-				"          circuitId as integer,",
-				"          lat as double",
-				"     ),",
-				"     errors: true) ~> cast1",
 				"aggregate1updated sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     format: 'parquet',",
