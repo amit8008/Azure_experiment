@@ -3,7 +3,7 @@ resources:
   pipelines:
     grds_bundle_pipeline:
       name: grds_bundle_pipeline
-      catalog: samples
+      catalog: dbacademy
       schema: labuser11327437_1757240457
       serverless: true
       libraries:
