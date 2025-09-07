@@ -1,0 +1,14 @@
+# The main pipeline for grds_bundle
+resources:
+  pipelines:
+    grds_bundle_pipeline:
+      name: grds_bundle_pipeline
+      catalog: samples
+      schema: labuser11327437_1757240457
+      serverless: true
+      libraries:
+        - notebook:
+            path: ../src/dlt_pipeline.ipynb
+
+      configuration:
+        bundle.sourcePath: ${workspace.file_path}/src
