@@ -1,0 +1,87 @@
+name: Airflow CI/CD
+
+on:
+  pull_request:
+    branches:
+      - main          # Run tests on PRs targeting main
+  push:
+    branches:
+      - main          # Deploy only on merges to main
+  workflow_dispatch:
+    inputs:
+      deploy_env:
+        description: "Target environment"
+        required: true
+        default: "dev"
+        type: choice
+        options: [dev, qa, prod]
+
+jobs:
+  # -------------------------
+  # 1. PR Validation Job
+  # -------------------------
+  validate:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pytest flake8
+
+      - name: Run lint and tests
+        run: |
+          flake8 dags plugins
+          pytest tests/
+
+  # -------------------------
+  # 2. Deploy Job
+  # -------------------------
+  deploy:
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+
+    env:
+      DAG_PATH: /opt/airflow/dags
+      PLUGIN_PATH: /opt/airflow/plugins
+      AIRFLOW_USER: airflow
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.AIRFLOW_SSH_KEY }}
+
+      - name: Set target host
+        id: set-host
+        run: |
+          if [ "${{ github.event.inputs.deploy_env }}" = "qa" ]; then
+            echo "host=qa-airflow-server" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event.inputs.deploy_env }}" = "prod" ]; then
+            echo "host=prod-airflow-server" >> $GITHUB_OUTPUT
+          else
+            echo "host=dev-airflow-server" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Deploy DAGs & Plugins
+        run: |
+          rsync -avz dags/ $AIRFLOW_USER@${{ steps.set-host.outputs.host }}:$DAG_PATH/
+          rsync -avz plugins/ $AIRFLOW_USER@${{ steps.set-host.outputs.host }}:$PLUGIN_PATH/
+
+      - name: Deploy configs
+        run: |
+          scp config/${{ github.event.inputs.deploy_env }}.env $AIRFLOW_USER@${{ steps.set-host.outputs.host }}:/opt/airflow/config.env
+          scp config/airflow_variables.json $AIRFLOW_USER@${{ steps.set-host.outputs.host }}:/opt/airflow/airflow_variables.json
+          ssh $AIRFLOW_USER@${{ steps.set-host.outputs.host }} "source /opt/airflow/config.env && airflow variables import /opt/airflow/airflow_variables.json"
